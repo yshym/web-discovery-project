@@ -5702,7 +5702,7 @@ const WebDiscoveryProject = {
   },
 };
 WebDiscoveryProject.contentExtractor = new ContentExtractor(
-  WebDiscoveryProject
+  network: this.network,
 );
 
 export default WebDiscoveryProject;
