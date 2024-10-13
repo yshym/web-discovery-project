@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import logger from './logger';
-import { sanitizeUrl } from './sanitizer';
+import { sanitizeUrl } from '../core/sanitizer';
 
 function expectString(arg) {
   if (typeof arg !== 'string') {
@@ -223,7 +223,7 @@ export default class Patterns {
     this._rules = {};
   }
 
-  updatePatterns(rules) {
+  update(rules) {
     logger.info('Loaded patterns:', rules);
     this._rules = rules;
   }
@@ -242,30 +242,7 @@ export default class Patterns {
     return this._rules;
   }
 
-  /**
-   * Constructs a "doublefetchRequest" object, which defines the doublefetch
-   * requests for the given URL.
-   *
-   * Example outputs:
-   * 1. { url: 'https://example.test/foo', followRedirects: true, headers: { Cookie: 'bar' } }
-   *  - allow redirects and overwrite the "Cookie" HTTP headers (as 'Cookie: bar')
-   * 2. { url: 'https://example.test/foo' }
-   *  - do not allow redirects and do not overwrite headers
-   */
-  createDoublefetchRequest(msgType, url) {
-    if (!this._rules[msgType]) {
-      return null;
-    }
-    const doublefetchRequest = { url };
-    if (this._rules[msgType].doublefetch) {
-      const { headers, followRedirects } = this._rules[msgType].doublefetch;
-      if (followRedirects) {
-        doublefetchRequest.redirect = 'follow';
-      }
-      if (headers) {
-        doublefetchRequest.headers = headers;
-      }
-    }
-    return doublefetchRequest;
+  typeExists(type) {
+    return type in this._rules;
   }
 }

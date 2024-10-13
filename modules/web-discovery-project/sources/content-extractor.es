@@ -5,8 +5,7 @@
 /* eslint-disable no-continue */
 
 import logger from './logger';
-import { lookupBuiltinTransform } from '../core/patterns';
-import { DoublefetchHandler } from "./doublefetch-handler";
+import { lookupBuiltinTransform } from './patterns';
 
 export function parseQueryString(query) {
   if (query.length === 0) {
@@ -90,20 +89,12 @@ function findFirstMatch(rootItem, selectorDef, baseURI) {
   );
 }
 
-export default class ContentExtractor {
-  constructor( patterns, network ) {
+export class ContentExtractor {
+  constructor(patterns) {
     this.patterns = patterns;
-    this.network = network;
-    this.doublefetchHandler = new DoublefetchHandler({
-      onHostnameResolved: (domain, ip) => {
-        // Remember the DNS mapping because not all platforms
-        // provide an API for DNS resolution.
-        this.network.cacheDnsResolution(domain, ip);
-      },
-    });
   }
 
-  async checkURL(pageContent, url) {
+  async run(pageContent, type, query, url) {
     function discard(reason = '') {
       logger.debug('No messages found for query:', query, 'Reason:', reason);
       return {

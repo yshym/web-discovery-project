@@ -61,14 +61,9 @@ function findAllFixtures() {
  * If they deviate too much from production, the tests will have less
  * value in catching bugs.
  */
-const DEFAULT_PATTERNS = {
-  normal: jsonParse(
-    fs.readFileSync(`${FIXTURES_BASE_PATH}/patterns.json`, "utf8")
-  ),
-  strict: jsonParse(
-    fs.readFileSync(`${FIXTURES_BASE_PATH}/patterns-anon.json`, "utf8")
-  ),
-};
+const DEFAULT_PATTERNS = jsonParse(
+  fs.readFileSync(`${FIXTURES_BASE_PATH}/rules.json`, "utf8")
+);
 
 const enableLogging = true;
 
@@ -181,6 +176,7 @@ export default describeModule(
         global.URL = global.URL || require("url").URL;
 
         ContentExtractor = this.module().ContentExtractor;
+        Patterns = this.module().Patterns;
         WebDiscoveryProject = {
           debug: enableLogging,
           msgType: "wdp",
@@ -199,8 +195,9 @@ export default describeModule(
           addStrictQueries: sinon.fake(),
 
           queryCache: {},
+          patterns: new Patterns(),
         };
-        uut = new ContentExtractor(WebDiscoveryProject);
+        uut = new ContentExtractor(WebDiscoveryProject.patterns);
       });
 
       afterEach(function () {
@@ -245,8 +242,7 @@ export default describeModule(
 
       describe("with a realistic ruleset", function () {
         beforeEach(function () {
-          uut.updatePatterns(DEFAULT_PATTERNS.normal, "normal");
-          uut.updatePatterns(DEFAULT_PATTERNS.strict, "strict");
+          uut.patterns.update(DEFAULT_PATTERNS);
         });
 
         describe("#isSearchEngineUrl", function () {
@@ -300,8 +296,7 @@ export default describeModule(
       findAllFixtures().forEach((fixtureDir) => {
         describe(`in scenario: ${fixtureDir}`, function () {
           beforeEach(function () {
-            uut.updatePatterns(DEFAULT_PATTERNS.normal, "normal");
-            uut.updatePatterns(DEFAULT_PATTERNS.strict, "strict");
+            uut.patterns.update(DEFAULT_PATTERNS);
           });
 
           it("should pass the fixture's expections", function () {

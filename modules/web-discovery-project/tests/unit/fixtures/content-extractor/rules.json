@@ -1,0 +1,220 @@
+{
+  "search-google-images": {
+    "input": {
+      "form[role=\"search\"]": {
+        "first": {
+          "q": {
+            "select": "form input[name=\"q\"]",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "search-google-videos": {
+    "input": {
+      "dont>match>body>head>html": {
+        "first": {
+          "q": {
+            "attr": "url",
+            "transforms": [["decodeURIComponent"]]
+          }
+        }
+      },
+      "form[role=\"search\"]": {
+        "first": {
+          "q": {
+            "select": "form .gLFyf[name=\"q\"]",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "search-google": {
+    "input": {
+      "dont>match>body>head>html": {
+        "first": {
+          "q": {
+            "attr": "url",
+            "transforms": [["decodeURIComponent"]]
+          }
+        }
+      },
+      "#mobile-search #sfcnt": {
+        "first": {
+          "q": {
+            "select": "input",
+            "attr": "value"
+          }
+        }
+      },
+      "form[role=\"search\"]": {
+        "first": {
+          "q": {
+            "select": "form .gLFyf[name=\"q\"]",
+            "attr": "value"
+          }
+        }
+      },
+      "#search": {
+        "first": {
+          "q": {
+            "select": "#rso",
+            "attr": "data-async-context",
+            "tramsforms": [["split", "query:", 1]]
+          },
+          "widgetTitle": {
+            "select": "div.EfDVh.viOShc div.ofy7ae, div.EfDVh.viOShc table.torspo_view__table span.tsp-ht",
+            "attr": "textContent"
+          }
+        }
+      }
+    },
+    "output": {
+      "widgetTitle": {
+        "type": "single",
+        "results": "single",
+        "fields": [
+          {
+            "key": "q",
+            "source": "#search"
+          },
+          {
+            "key": "widgetTitle",
+            "source": "#search"
+          }
+        ]
+      }
+    }
+  },
+  "search-yahoo": {
+    "input": {
+      ".sbq-w": {
+        "first": {
+          "q": {
+            "select": "#yschsp",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "linkedin": {
+    "input": {
+      ".profile-card": {
+        "first": {
+          "img": {
+            "select": ".image",
+            "attr": "src"
+          },
+          "fullName": {
+            "select": ".content h3 a",
+            "attr": "text"
+          },
+          "profileLink": {
+            "select": ".content h3 a",
+            "attr": "href"
+          },
+          "currentWork": {
+            "select": ".content p.headline",
+            "attr": "textContent"
+          }
+        }
+      }
+    },
+    "output": {
+      "linkedin": {
+        "fields": [
+          {
+            "key": "p",
+            "source": ".profile-card"
+          }
+        ]
+      }
+    }
+  },
+  "search-bing-images": {
+    "input": {
+      "#sb_form": {
+        "first": {
+          "q": {
+            "select": "#sb_form_q",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "search-bing": {
+    "input": {
+      "#sb_form": {
+        "first": {
+          "q": {
+            "select": "#sb_form_q",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "search-am": {
+    "input": {
+      "first": {
+        "#twotabsearchtextbox": {
+          "q": {
+            "attr": "value"
+          }
+        },
+        "[data-component-type=\"s-result-sort\"]": {
+          "q": {
+            "select": "form > input[name=\"k\"]",
+            "attr": "value"
+          }
+        }
+      }
+    }
+  },
+  "amp": {
+    "input": {
+      "first": {
+        ".nav-search-field > input": {
+          "q": {
+            "attr": "value"
+          }
+        },
+        "#wayfinding-breadcrumbs_container": {
+          "c": {
+            "select": "div",
+            "attr": "textContent"
+          }
+        },
+        "link[rel='canonical']": {
+          "curl": {
+            "attr": "href"
+          }
+        }
+      }
+    },
+    "output": {
+      "q": {
+        "type": "query",
+        "results": "clustered",
+        "action": "category-am",
+        "fields": [
+          {
+            "key": "c",
+            "source": "#wayfinding-breadcrumbs_container"
+          },
+          {
+            "key": "curl",
+            "source": "link[rel='canonical']"
+          },
+          {
+            "key": "ctry"
+          }
+        ]
+      }
+    }
+  }
+}

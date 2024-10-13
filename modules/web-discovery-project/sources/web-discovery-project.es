@@ -23,6 +23,8 @@ import { parseURL, Network } from "./network";
 import prefs from "../core/prefs";
 import pacemaker from "../core/services/pacemaker";
 import SafebrowsingEndpoint from "./safebrowsing-endpoint";
+import UrlAnalyzer from "./url-analyzer";
+import Patterns from "./patterns";
 
 /*
 Configuration for Bloomfilter
@@ -96,6 +98,8 @@ const WebDiscoveryProject = {
   deadFiveMts: 5,
   deadTwentyMts: 20,
   msgType: "wdp",
+  patterns: new Patterns(),
+  _patternsLastUpdated: null,
   probHashLogM: [
     [
       -1.839225984234144, -1.8009413231413045, -2.5864601561900273,
@@ -1595,11 +1599,11 @@ const WebDiscoveryProject = {
       config.settings.ENDPOINT_PATTERNS,
       (content) => {
         try {
-          const { normal, strict } = JSON.parse(content);
-          logger.debug("Got new patterns", { normal, strict });
-          WebDiscoveryProject.contentExtractor.updatePatterns(normal, "normal");
-          WebDiscoveryProject.contentExtractor.updatePatterns(strict, "strict");
-          logger.info("WebDiscoveryProject patterns successfully updated");
+          const rules = JSON.parse(content);
+          logger.debug("Got new patterns", rules);
+          WebDiscoveryProject.patterns.update(rules);
+          WebDiscoveryProject._patternsLastUpdated = new Date();
+          logger.info("WebDiscoveryProject patterns successfully updated at ${this._patternsLastUpdated}");
         } catch (e) {
           logger.warn("Failed to apply new WebDiscoveryProject patterns", e);
         }
@@ -4667,11 +4671,15 @@ const WebDiscoveryProject = {
     else return null;
   },
 
-  checkURL(pageContent, url, ruleset) {
-    return WebDiscoveryProject.contentExtractor.checkURL(
+  checkURL(pageContent, url) {
+    const { found, type, query } = WebDiscoveryProject.urlAnalyzer.parseLinks(url);
+    if (!found)
+      return { messages: [] };
+    return WebDiscoveryProject.contentExtractor.run(
       pageContent,
+      type,
+      query,
       url,
-      ruleset
     );
   },
 
@@ -5701,8 +5709,9 @@ const WebDiscoveryProject = {
     }
   },
 };
+WebDiscoveryProject.urlAnalyzer = new UrlAnalyzer(WebDiscoveryProject.patterns);
 WebDiscoveryProject.contentExtractor = new ContentExtractor(
-  network: this.network,
+  WebDiscoveryProject.patterns,
 );
 
 export default WebDiscoveryProject;
