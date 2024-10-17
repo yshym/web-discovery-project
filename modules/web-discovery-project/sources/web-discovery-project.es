@@ -23,7 +23,6 @@ import { parseURL, Network } from "./network";
 import prefs from "../core/prefs";
 import pacemaker from "../core/services/pacemaker";
 import SafebrowsingEndpoint from "./safebrowsing-endpoint";
-import UrlAnalyzer from "./url-analyzer";
 import Patterns from "./patterns";
 
 /*
@@ -4672,23 +4671,17 @@ const WebDiscoveryProject = {
   },
 
   checkURL(pageContent, url) {
-    const { found, type, query } = WebDiscoveryProject.urlAnalyzer.parseLinks(url);
-    if (!found)
-      return { messages: [] };
-    return WebDiscoveryProject.contentExtractor.run(
-      pageContent,
-      type,
-      query,
-      url,
-    );
+    const { messages } = WebDiscoveryProject.contentExtractor.run(pageContent, url);
+    for (const message of messages)
+      WebDiscoveryProject.telemetry({
+        type: WebDiscoveryProject.msgType,
+        action: message.action,
+        payload: message.payload,
+      });
   },
 
   /**
    * Used in context-search module
-   *
-   * TODO: A safer option would be to hard-code the list of
-   * search engines. Otherwise, updating the patterns can potentially
-   * change the search results that we show.
    */
   isSearchEngineUrl(url) {
     return WebDiscoveryProject.contentExtractor.isSearchEngineUrl(url);
@@ -5709,9 +5702,9 @@ const WebDiscoveryProject = {
     }
   },
 };
-WebDiscoveryProject.urlAnalyzer = new UrlAnalyzer(WebDiscoveryProject.patterns);
 WebDiscoveryProject.contentExtractor = new ContentExtractor(
   WebDiscoveryProject.patterns,
+  WebDiscoveryProject,
 );
 
 export default WebDiscoveryProject;

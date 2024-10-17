@@ -73,6 +73,15 @@ const URL_PATTERNS = [
       /^https:[/][/][^/]*linkedin[.][^/]+[/]pub[/]dir+/,
   }
 ];
+const SEARCH_ENGINE_TYPES = new Set([
+  "search-google-images",
+  "search-google-videos",
+  "search-google",
+  "search-yahoo",
+  "search-bing-images",
+  "search-bing",
+  "search-duckduckgo",
+]);
 
 export default class UrlAnalyzer {
   constructor(patterns) {
@@ -99,7 +108,7 @@ export default class UrlAnalyzer {
           return { found: false };
         }
         if (!this.patterns.typeExists(type)) {
-          logger.info(
+          logger.debug(
             'Matching rule for',
             url,
             'skipped (no matching server side rules exist)',
@@ -111,5 +120,21 @@ export default class UrlAnalyzer {
     }
 
     return { found: false };
+  }
+
+  isSearchEngineUrl(url) {
+    const { found, type } = this.parseLinks(url);
+    if (!found)
+      return false;
+    return SEARCH_ENGINE_TYPES.has(type);
+  }
+
+  tryExtractBraveSerpQuery(url) {
+    const isBraveSearch =
+      url.startsWith("https://search.brave.com/search?") ||
+      url.startsWith("https://bravesearch.com/search?") ||
+      url.startsWith("https://search.brave.software/search?");
+    const parsedUrl = new ImmutableURL(url);
+    return isBraveSearch && parsedUrl.searchParams.get("q");
   }
 }

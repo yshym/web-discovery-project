@@ -4,8 +4,9 @@
 
 /* eslint-disable no-continue */
 
-import logger from './logger';
-import { lookupBuiltinTransform } from './patterns';
+import logger from "./logger";
+import { lookupBuiltinTransform } from "./patterns";
+import UrlAnalyzer from "./url-analyzer";
 
 export function parseQueryString(query) {
   if (query.length === 0) {
@@ -31,10 +32,10 @@ export function parseQueryString(query) {
 function runSelector(item, selector, attr, baseURI) {
   const elem = selector ? item.querySelector(selector) : item;
   if (elem) {
-    if (attr === 'textContent') {
+    if (attr === "textContent") {
       return elem.textContent;
     }
-    if (attr === 'href') {
+    if (attr === "href") {
       // Going throw the attribute "href" avoids some of the problems of using
       // directly "elem.href". For relative links the DOMParser cannot
       // accidentally fill in the extension ID as the base. Another advantage
@@ -45,7 +46,7 @@ function runSelector(item, selector, attr, baseURI) {
       // notes about the intended semantic:
       // * links should be as close to the original page as possible
       // * extensions IDs must not leak into the output
-      const rawLink = elem.getAttribute('href');
+      const rawLink = elem.getAttribute("href");
       return rawLink ? new URL(rawLink, baseURI).href : null;
     }
     if (elem.hasAttribute(attr)) {
@@ -57,7 +58,7 @@ function runSelector(item, selector, attr, baseURI) {
 
 function runTransforms(value, transformSteps = []) {
   if (!Array.isArray(transformSteps)) {
-    throw new Error('Transform definitions must be array.');
+    throw new Error("Transform definitions must be array.");
   }
   if (value === undefined || value === null) {
     return null;
@@ -90,30 +91,30 @@ function findFirstMatch(rootItem, selectorDef, baseURI) {
 }
 
 export class ContentExtractor {
-  constructor(patterns) {
+  constructor(patterns, wdp) {
+    this.wdp = wdp;
     this.patterns = patterns;
+    this.urlAnalyzer = new UrlAnalyzer(this.patterns);
   }
 
-  async run(pageContent, type, query, url) {
-    function discard(reason = '') {
-      logger.debug('No messages found for query:', query, 'Reason:', reason);
+  run(pageContent, url) {
+    function discard(reason = "") {
+      logger.debug("No messages found for query:", query, "Reason:", reason);
       return {
         messages: [],
         reason,
       };
     }
 
-    const messages = this.extractMessages(
-      pageContent,
-      type,
-      query,
-      url,
-    );
+    const { found, type, query } = this.urlAnalyzer.parseLinks(url);
+    if (!found) return discard("No content found.");
+
+    const messages = this.extractMessages(pageContent, type, query, url);
     if (messages.length === 0) {
-      return discard('No content found.');
+      return discard("No content found.");
     }
 
-    logger.info(messages.length, 'messages found for query:', query);
+    logger.debug(messages.length, "messages found for query:", query);
     return { messages };
   }
 
@@ -151,7 +152,7 @@ export class ContentExtractor {
         }
       } else {
         throw new Error(
-          'Internal error: bad selector (expected "first" or "all")',
+          'Internal error: bad selector (expected "first" or "all")'
         );
       }
     }
@@ -160,9 +161,9 @@ export class ContentExtractor {
     const context = {
       q: query ?? null,
       qurl: url,
-      ctry: this.sanitizer.getSafeCountryCode(),
+      ctry: this.wdp.getCountryCode(),
     };
-    const isPresent = (x) => x !== null && x !== undefined && x !== '';
+    const isPresent = (x) => x !== null && x !== undefined && x !== "";
 
     // Now combine the results to build the messages as specified
     // in the "output" section of the patterns.
@@ -197,7 +198,7 @@ export class ContentExtractor {
         if (source) {
           if (!input[source]) {
             throw new Error(
-              `Output rule for action=${action} references invalid input source=${source}`,
+              `Output rule for action=${action} references invalid input source=${source}`
             );
           }
           if (input[source].first) {
@@ -229,7 +230,7 @@ export class ContentExtractor {
             payload[key] = { ...cleanedResults };
           } else {
             throw new Error(
-              `Output rule for action=${action} does not match input key=${key}`,
+              `Output rule for action=${action} does not match input key=${key}`
             );
           }
         } else {
@@ -244,7 +245,7 @@ export class ContentExtractor {
       const body = { action, payload };
       messages.push(body);
     }
-    logger.debug('Found the following messages:', messages);
+    logger.debug("Found the following messages:", messages);
     return messages;
   }
 }

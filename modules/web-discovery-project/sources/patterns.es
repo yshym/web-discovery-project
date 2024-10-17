@@ -2,17 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import logger from './logger';
-import { sanitizeUrl } from '../core/sanitizer';
+import logger from "./logger";
+import { sanitizeUrl } from "../core/sanitizer";
 
 function expectString(arg) {
-  if (typeof arg !== 'string') {
+  if (typeof arg !== "string") {
     throw new Error(`Expected string argument but got: ${arg}`);
   }
 }
 
 function expectInteger(arg) {
-  if (typeof arg !== 'number' || arg % 1 !== 0) {
+  if (typeof arg !== "number" || arg % 1 !== 0) {
     throw new Error(`Expected integer argument but got: ${arg}`);
   }
 }
@@ -113,7 +113,7 @@ const TRANSFORMS = new Map(
       try {
         // we only need the query parameter, but to handle relative
         // URLs we have to pass a base URL (any domain will work)
-        return new URL(x, 'http://x').searchParams.get(queryParam);
+        return new URL(x, "http://x").searchParams.get(queryParam);
       } catch (e) {
         return null;
       }
@@ -183,25 +183,25 @@ const TRANSFORMS = new Map(
       expectBoolean(extractObjects);
       try {
         let obj = JSON.parse(x);
-        for (const field of path.split('.')) {
+        for (const field of path.split(".")) {
           obj = obj[field];
         }
-        if (typeof obj === 'string') {
+        if (typeof obj === "string") {
           return obj;
         }
-        if (typeof obj === 'number' || typeof obj === 'boolean') {
+        if (typeof obj === "number" || typeof obj === "boolean") {
           return obj.toString();
         }
         if (extractObjects && obj) {
           return JSON.stringify(obj);
         }
         // prevent uncontrolled text extraction
-        return '';
+        return "";
       } catch (e) {
-        return '';
+        return "";
       }
     },
-  }),
+  })
 );
 
 export function lookupBuiltinTransform(name) {
@@ -224,7 +224,7 @@ export default class Patterns {
   }
 
   update(rules) {
-    logger.info('Loaded patterns:', rules);
+    logger.info("Loaded patterns:", rules);
     this._rules = rules;
   }
 
@@ -243,6 +243,6 @@ export default class Patterns {
   }
 
   typeExists(type) {
-    return type in this._rules;
+    return type in this.getRulesSnapshot();
   }
 }

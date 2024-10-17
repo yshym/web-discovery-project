@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import logger from './logger';
+import logger from "./logger";
 
 function isCharNumber(char) {
   const code = char.charCodeAt(0);
@@ -34,13 +34,13 @@ export function isValidISSN(issn) {
   if (!/^[0-9]{4}-?[0-9]{3}[0-9xX]$/.test(issn)) {
     return false;
   }
-  issn = issn.replace('-', '');
+  issn = issn.replace("-", "");
 
   let checksum = 0;
   for (let i = 0; i < 7; i++) {
     checksum += uncheckedCharToNumber(issn[i]) * (8 - i);
   }
-  const endsWithX = issn[7] === 'x' || issn[7] === 'X';
+  const endsWithX = issn[7] === "x" || issn[7] === "X";
   checksum += endsWithX ? 10 : uncheckedCharToNumber(issn[7]);
 
   return checksum % 11 === 0;
@@ -73,16 +73,16 @@ function checkForEmail(str) {
  */
 function hasLongNumber(str) {
   // allow one ISSN number
-  const issn = str.split(' ').find(isValidISSN);
+  const issn = str.split(" ").find(isValidISSN);
   if (issn) {
-    str = str.replace(issn, ' ');
+    str = str.replace(issn, " ");
   }
 
   const numbers = str
-    .replace(/[^A-Za-z0-9]/g, '')
-    .replace(/[^0-9]+/g, ' ')
+    .replace(/[^A-Za-z0-9]/g, "")
+    .replace(/[^0-9]+/g, " ")
     .trim()
-    .split(' ')
+    .split(" ")
     .filter((num) => num.length > 2);
   if (numbers.length === 1) {
     const num = numbers[0];
@@ -153,43 +153,43 @@ export function checkSuspiciousQuery(query) {
   // Note: this code doesn't trim but preserves a leading or trailing
   // whitespace. We could trim  (and the expected differences would be minimal).
   // Yet there is little benefit in trimming and it would lose information.
-  query = query.replace(/\s+/g, ' ');
+  query = query.replace(/\s+/g, " ");
 
   // Remove the msg if the query is too long
   if (query.length > 120) {
-    return discard('too long (120 character limit)');
+    return discard("too long (120 character limit)");
   }
   if (query.length > 50 && hasLogograms(query)) {
-    return discard('too long (50 characters and logograms are present)');
+    return discard("too long (50 characters and logograms are present)");
   }
 
-  const words = query.split(' ');
+  const words = query.split(" ");
   if (words.length > 9) {
     if (words.filter((x) => x.length >= 4).length > 16) {
-      return discard('too many words');
+      return discard("too many words");
     }
     if (hasLogograms(query)) {
-      return discard('too many words (smaller limit but logograms are present');
+      return discard("too many words (smaller limit but logograms are present");
     }
   }
 
   if (hasLongNumber(query)) {
-    return discard('long number detected');
+    return discard("long number detected");
   }
 
   // Remove if it contains text that could be an email,
   // even if the email is not well formed
   if (checkForEmail(query)) {
-    return discard('looks like an email');
+    return discard("looks like an email");
   }
 
   if (/[^:]+:[^@]+@/.test(query)) {
-    return discard('looks like an http password');
+    return discard("looks like an http password");
   }
 
   for (let i = 0; i < words.length; i += 1) {
     if (words[i].length > 45) {
-      return discard('found long word');
+      return discard("found long word");
     }
 
     // Long words are common in some languages (e.g. German)
@@ -197,7 +197,7 @@ export function checkSuspiciousQuery(query) {
       words[i].length > 20 &&
       !/^[a-zA-ZäöüéÄÖÜ][a-zäöüéß]+$/.test(words[i])
     ) {
-      return discard('found long word (smaller limit but uncommon shape)');
+      return discard("found long word (smaller limit but uncommon shape)");
     }
   }
 
@@ -214,7 +214,7 @@ function tryParseUrl(url) {
 
 function checkForInternalIp(hostname) {
   // TODO: this could be extended to detect more cases
-  return hostname === 'localhost' || hostname === '127.0.0.1';
+  return hostname === "localhost" || hostname === "127.0.0.1";
 }
 
 /**
@@ -225,7 +225,7 @@ function checkForInternalIp(hostname) {
  */
 function urlLeaksExtensionId(url) {
   return (
-    url.startsWith('moz-extension://') || url.startsWith('chrome-extension://')
+    url.startsWith("moz-extension://") || url.startsWith("chrome-extension://")
   );
 }
 
@@ -248,31 +248,31 @@ function urlLeaksExtensionId(url) {
  * dropping (or truncating) too much.
  */
 export function sanitizeUrl(url) {
-  const accept = () => ({ result: 'safe', safeUrl: url });
-  const drop = (reason) => ({ result: 'dropped', safeUrl: null, reason });
+  const accept = () => ({ result: "safe", safeUrl: url });
+  const drop = (reason) => ({ result: "dropped", safeUrl: null, reason });
 
   // first run some sanity check on the structure of the URL
   const parsedUrl = tryParseUrl(url);
   if (!parsedUrl) {
-    return drop('invalid URL');
+    return drop("invalid URL");
   }
   if (parsedUrl.username) {
-    return drop('URL sets username');
+    return drop("URL sets username");
   }
   if (parsedUrl.password) {
-    return drop('URL sets password');
+    return drop("URL sets password");
   }
-  if (parsedUrl.port && parsedUrl.port !== '80' && parsedUrl.port !== '443') {
-    return drop('URL has uncommon port');
+  if (parsedUrl.port && parsedUrl.port !== "80" && parsedUrl.port !== "443") {
+    return drop("URL has uncommon port");
   }
-  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-    return drop('URL has uncommon protocol');
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    return drop("URL has uncommon protocol");
   }
   if (checkForInternalIp(parsedUrl.hostname)) {
-    return drop('URL is not public');
+    return drop("URL is not public");
   }
   if (urlLeaksExtensionId(url)) {
-    return drop('URL leaks extension ID');
+    return drop("URL leaks extension ID");
   }
 
   try {
@@ -286,9 +286,9 @@ export function sanitizeUrl(url) {
     // identifiers in the hostname.
     const truncate = (reason) => {
       const safeUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}/ (PROTECTED)`;
-      logger.debug('sanitizeUrl truncated URL:', url, '->', safeUrl);
+      logger.debug("sanitizeUrl truncated URL:", url, "->", safeUrl);
       return {
-        result: 'truncated',
+        result: "truncated",
         safeUrl,
         reason,
       };
@@ -296,15 +296,15 @@ export function sanitizeUrl(url) {
 
     // TODO: these rules could use some polishing
     if (url.hostname > 50) {
-      return drop('hostname too long');
+      return drop("hostname too long");
     }
     if (url.length > 800) {
-      return truncate('url too long');
+      return truncate("url too long");
     }
 
     const decodedUrl = decodeURIComponent(url);
     if (checkForEmail(url) || checkForEmail(decodedUrl)) {
-      return truncate('potential email found');
+      return truncate("potential email found");
     }
 
     // TODO: check each path and query parameter and truncate if there
@@ -313,47 +313,6 @@ export function sanitizeUrl(url) {
     return accept();
   } catch (e) {
     logger.warn(`Unexpected error in sanitizeUrl. Skipping url=${url}`, e);
-    return drop('Unexpected error');
-  }
-}
-
-/**
- * Set of heuristics to prevent accidentally leaking sensitive data.
- *
- * It is a hard problem to classify sensititive from non-sensitive data.
- * If you look at the risk of false positives (non-sensitive data being dropped)
- * versus fast negatives (sensitive data being sent out), the risks are very clear.
- *
- * Leaking sensitive data is far more dangerous then dropping harmless messages
- * for multiple reasons. Because of that, we should always thrive for being
- * rather too conservative than being to open when it comes to the heuristics.
- *
- * In other words, because of the non-symmetric risks, it is unavoidable that
- * you will find many harmless examples that will be rejected by the rules.
- */
-export default class Sanitizer {
-  constructor(countryProvider) {
-    this.countryProvider = countryProvider;
-  }
-
-  checkSuspiciousQuery(query) {
-    const result = checkSuspiciousQuery(query);
-    if (!result.accept) {
-      logger.debug(
-        'checkSuspiciousQuery rejected query:',
-        query,
-        ', reason:',
-        result.reason,
-      );
-    }
-    return result;
-  }
-
-  maskURL(url) {
-    return sanitizeUrl(url).safeUrl;
-  }
-
-  getSafeCountryCode() {
-    return this.countryProvider.getSafeCountryCode();
+    return drop("Unexpected error");
   }
 }
