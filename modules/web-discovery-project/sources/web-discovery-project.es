@@ -5672,35 +5672,6 @@ const WebDiscoveryProject = {
       }
     });
   },
-  addStrictQueries(url, query) {
-    // In some cases, we get query undefined.
-    if (!query) {
-      _log(">> Got an undefined query >>> " + url);
-      return;
-    }
-
-    if (WebDiscoveryProject.isSuspiciousQuery(query)) {
-      _log("Dropping suspicious query before double-fetch:", query);
-      return;
-    }
-
-    const { isSearchEngineUrl, queryUrl } =
-      WebDiscoveryProject.contentExtractor.checkAnonSearchURL(url, query);
-    if (isSearchEngineUrl) {
-      try {
-        const qObj = {
-          qurl: queryUrl,
-          ts: Date.now(),
-          tDiff: getRandomIntInclusive(1, 20),
-        };
-        logger.debug("PCN: pushed to strictQueries:", queryUrl);
-        WebDiscoveryProject.strictQueries.push(qObj);
-        WebDiscoveryProject.saveStrictQueries();
-      } catch (ee) {
-        logger.error("Failed to add query:", ee);
-      }
-    }
-  },
 };
 WebDiscoveryProject.contentExtractor = new ContentExtractor(
   WebDiscoveryProject.patterns,
