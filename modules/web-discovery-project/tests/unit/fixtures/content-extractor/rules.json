@@ -198,9 +198,6 @@
     },
     "output": {
       "q": {
-        "type": "query",
-        "results": "clustered",
-        "action": "category-am",
         "fields": [
           {
             "key": "c",
