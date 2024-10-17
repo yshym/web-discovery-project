@@ -19,7 +19,7 @@ function jsonParse(text) {
 
 const FIXTURES_BASE_PATH = path.join(__dirname, "fixtures/content-extractor");
 const DEFAULT_PATTERNS = jsonParse(
-  fs.readFileSync(`${FIXTURES_BASE_PATH}/rules-anon.json`, "utf8")
+  fs.readFileSync(`${FIXTURES_BASE_PATH}/rules.json`, "utf8")
 );
 const ALLOWED_SOURCES = new Set(["go", "bing"]);
 

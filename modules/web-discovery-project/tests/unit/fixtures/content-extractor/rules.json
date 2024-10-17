@@ -1,59 +1,24 @@
 {
-  "search-google-images": {
-    "input": {
-      "form[role=\"search\"]": {
-        "first": {
-          "q": {
-            "select": "form input[name=\"q\"]",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
-  "search-google-videos": {
-    "input": {
-      "dont>match>body>head>html": {
-        "first": {
-          "q": {
-            "attr": "url",
-            "transforms": [["decodeURIComponent"]]
-          }
-        }
-      },
-      "form[role=\"search\"]": {
-        "first": {
-          "q": {
-            "select": "form .gLFyf[name=\"q\"]",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
   "search-google": {
     "input": {
-      "dont>match>body>head>html": {
-        "first": {
-          "q": {
-            "attr": "url",
-            "transforms": [["decodeURIComponent"]]
-          }
-        }
-      },
-      "#mobile-search #sfcnt": {
-        "first": {
-          "q": {
-            "select": "input",
-            "attr": "value"
-          }
-        }
-      },
-      "form[role=\"search\"]": {
-        "first": {
-          "q": {
-            "select": "form .gLFyf[name=\"q\"]",
-            "attr": "value"
+      "div#rso div.g": {
+        "all": {
+          "t": {
+            "select": "a > br + h3, g-section-with-header g-link > a > h3",
+            "attr": "textContent"
+          },
+          "u": {
+            "select": "div.yuRUbf > div > span[role=link] > a[jsname], div.yuRUbf > div > span > a, div.yuRUbf > div > a[jsname], div.nhaZ2c > div > span > a, div.DhN8Cf > div > a[jsname], g-section-with-header g-link > a.a-no-hover-decoration",
+            "attr": "href",
+            "transform": [["trySplit", "?ref_src=twsrc", 0]]
+          },
+          "age": {
+            "select": "div > span.MUxGbd > span, div.mSA5Bd > div.P7xzyf > span > span",
+            "attr": "textContent"
+          },
+          "m": {
+            "select": ".TXwUJf a.fl",
+            "attr": "textContent"
           }
         }
       },
@@ -62,153 +27,173 @@
           "q": {
             "select": "#rso",
             "attr": "data-async-context",
-            "tramsforms": [["split", "query:", 1]]
+            "transform": [
+              ["trySplit", "query:", 1],
+              ["decodeURIComponent"]
+            ]
+          }
+        }
+      },
+      "div#rcnt.GyAeWb div#rso > div.ULSxyf, div#rcnt.GyAeWb > div.M8OgIe": {
+        "all": {
+          "u": {
+            "select": "div.yuRUbf a",
+            "attr": "href",
+            "transform": [
+              ["trySplit", "#", 0],
+              ["maskU"]
+            ]
+          }
+        }
+      },
+      "#search g-scrolling-carousel img[id^='dimg_']": {
+        "all": {
+          "u": {
+            "attr": "title"
+          }
+        }
+      },
+      "div.EyBRub div[data-lpage]": {
+        "all": {
+          "u": {
+            "attr": "data-lpage"
+          }
+        }
+      },
+      "#rhs[role='complementary']": {
+        "first": {
+          "t": {
+            "select": "[data-attrid='title'], div[role=heading]",
+            "attr": "textContent"
           },
-          "widgetTitle": {
-            "select": "div.EfDVh.viOShc div.ofy7ae, div.EfDVh.viOShc table.torspo_view__table span.tsp-ht",
+          "desc": {
+            "select": "div[data-attrid='description'] div div.kno-rdesc > h3 + span:nth-last-child(2)",
+            "attr": "textContent"
+          },
+          "u": {
+            "select": "[data-attrid='description'] div.kno-rdesc > span:nth-last-child(1) > span + a",
+            "attr": "href"
+          }
+        }
+      },
+      "#rhs[role='complementary'] div.wDYxhc[data-attrid^='kc:/'], #rhs[role='complementary'] div.wDYxhc[data-attrid^='ss:/']": {
+        "all": {
+          "prop": {
+            "select": "div.rVusze > span.w8qArf:nth-child(1)",
+            "attr": "textContent",
+            "transform": [["trySplit", ": ", 0]]
+          },
+          "val": {
+            "select": "div.rVusze > span:nth-child(2)",
             "attr": "textContent"
           }
         }
       }
     },
     "output": {
-      "widgetTitle": {
-        "type": "single",
-        "results": "single",
+      "query": {
+        "fields": [
+          {
+            "key": "r",
+            "source": "div#rso div.g",
+            "requiredKeys": [
+              "t",
+              "u"
+            ]
+          },
+          {
+            "key": "q",
+            "source": "#search"
+          },
+          {
+            "key": "qurl"
+          },
+          {
+            "key": "ctry"
+          }
+        ]
+      },
+      "snippet2": {
+        "fields": [
+          {
+            "key": "r",
+            "source": "div#rcnt.GyAeWb div#rso > div.ULSxyf, div#rcnt.GyAeWb > div.M8OgIe"
+          },
+          {
+            "key": "q",
+            "source": "#search"
+          },
+          {
+            "key": "qurl"
+          },
+          {
+            "key": "ctry"
+          }
+        ]
+      },
+      "img-p": {
         "fields": [
           {
             "key": "q",
             "source": "#search"
           },
           {
-            "key": "widgetTitle",
-            "source": "#search"
-          }
-        ]
-      }
-    }
-  },
-  "search-yahoo": {
-    "input": {
-      ".sbq-w": {
-        "first": {
-          "q": {
-            "select": "#yschsp",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
-  "linkedin": {
-    "input": {
-      ".profile-card": {
-        "first": {
-          "img": {
-            "select": ".image",
-            "attr": "src"
-          },
-          "fullName": {
-            "select": ".content h3 a",
-            "attr": "text"
-          },
-          "profileLink": {
-            "select": ".content h3 a",
-            "attr": "href"
-          },
-          "currentWork": {
-            "select": ".content p.headline",
-            "attr": "textContent"
-          }
-        }
-      }
-    },
-    "output": {
-      "linkedin": {
-        "fields": [
-          {
-            "key": "p",
-            "source": ".profile-card"
-          }
-        ]
-      }
-    }
-  },
-  "search-bing-images": {
-    "input": {
-      "#sb_form": {
-        "first": {
-          "q": {
-            "select": "#sb_form_q",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
-  "search-bing": {
-    "input": {
-      "#sb_form": {
-        "first": {
-          "q": {
-            "select": "#sb_form_q",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
-  "search-am": {
-    "input": {
-      "first": {
-        "#twotabsearchtextbox": {
-          "q": {
-            "attr": "value"
-          }
-        },
-        "[data-component-type=\"s-result-sort\"]": {
-          "q": {
-            "select": "form > input[name=\"k\"]",
-            "attr": "value"
-          }
-        }
-      }
-    }
-  },
-  "amp": {
-    "input": {
-      "first": {
-        ".nav-search-field > input": {
-          "q": {
-            "attr": "value"
-          }
-        },
-        "#wayfinding-breadcrumbs_container": {
-          "c": {
-            "select": "div",
-            "attr": "textContent"
-          }
-        },
-        "link[rel='canonical']": {
-          "curl": {
-            "attr": "href"
-          }
-        }
-      }
-    },
-    "output": {
-      "q": {
-        "fields": [
-          {
-            "key": "c",
-            "source": "#wayfinding-breadcrumbs_container"
+            "key": "qurl"
           },
           {
-            "key": "curl",
-            "source": "link[rel='canonical']"
+            "key": "r",
+            "source": "#search g-scrolling-carousel img[id^='dimg_']"
           },
           {
             "key": "ctry"
+          }
+        ]
+      },
+      "img-p": {
+        "fields": [
+          {
+            "key": "q",
+            "source": "#search"
+          },
+          {
+            "key": "qurl"
+          },
+          {
+            "key": "r",
+            "source": "div.EyBRub div[data-lpage]"
+          },
+          {
+            "key": "ctry"
+          }
+        ]
+      },
+      "infobox": {
+        "fields": [
+          {
+            "key": "q",
+            "source": "#search"
+          },
+          {
+            "key": "qurl"
+          },
+          {
+            "key": "ctry"
+          },
+          {
+            "key": "t",
+            "source": "#rhs[role='complementary']"
+          },
+          {
+            "key": "desc",
+            "source": "#rhs[role='complementary']"
+          },
+          {
+            "key": "u",
+            "source": "#rhs[role='complementary']"
+          },
+          {
+            "key": "st",
+            "source": "#rhs[role='complementary'] div.wDYxhc[data-attrid^='kc:/'], #rhs[role='complementary'] div.wDYxhc[data-attrid^='ss:/']"
           }
         ]
       }

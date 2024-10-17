@@ -62,7 +62,7 @@ function findAllFixtures() {
  * value in catching bugs.
  */
 const DEFAULT_PATTERNS = jsonParse(
-  fs.readFileSync(`${FIXTURES_BASE_PATH}/rules-anon.json`, "utf8")
+  fs.readFileSync(`${FIXTURES_BASE_PATH}/rules.json`, "utf8")
 );
 
 const enableLogging = true;
