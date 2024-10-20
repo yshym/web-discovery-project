@@ -169,30 +169,11 @@ export default describeModule(
       };
 
       const oldURL = global.URL;
-      beforeEach(function () {
+      beforeEach(async function () {
         /* eslint-disable-next-line global-require */
         global.URL = global.URL || require("url").URL;
 
-        // let Patterns = null;
-        // this.system.import("../../../web-discovery-project/patterns.js").then((module) => Patterns = module.default);
-        // NOTE Implement Patterns here temporarily because of no ability to import it
-        class Patterns {
-          constructor() {
-            this._rules = {};
-          }
-
-          getRulesSnapshot() {
-            return this._rules;
-          }
-
-          update(rules) {
-            this._rules = rules;
-          }
-
-          typeExists(type) {
-            return type in this.getRulesSnapshot();
-          }
-        }
+        const Patterns = (await this.system.import("web-discovery-project/patterns")).default;
 
         ContentExtractor = this.module().ContentExtractor;
         WDP = {

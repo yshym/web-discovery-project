@@ -224,7 +224,7 @@ export default class Patterns {
   }
 
   update(rules) {
-    logger.info("Loaded patterns:", rules);
+    logger.debug("Loaded patterns:", rules);
     this._rules = rules;
   }
 
