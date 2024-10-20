@@ -103,7 +103,6 @@ const generateScenario = (url, html) => {
     patterns: new Patterns(),
     checkURL: (doc, url) => {
       const { messages } = WDP.contentExtractor.run(doc, url);
-      console.log(messages);
       for (const message of messages)
         WDP.telemetry({
           type: WDP.msgType,
@@ -151,11 +150,10 @@ const generateFixture = async (dir) => {
   } else {
     console.log("Missing scenario. Attempting to generate");
     scenario = generateScenario(url, page);
-    console.log(JSON.stringify(scenario, null, 2));
-    // fs.writeFileSync(
-    //   path.join(dir, "scenario.json"),
-    //   JSON.stringify(scenario, null, 2)
-    // );
+    fs.writeFileSync(
+      path.join(dir, "scenario.json"),
+      JSON.stringify(scenario, null, 2)
+    );
   }
 };
 
