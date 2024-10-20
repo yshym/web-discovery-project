@@ -210,7 +210,6 @@ export default describeModule(
           patterns: new Patterns(),
           checkURL: (doc, url) => {
             const { messages } = WDP.contentExtractor.run(doc, url);
-            console.log(messages);
             for (const message of messages)
               WDP.telemetry({
                 type: WDP.msgType,
