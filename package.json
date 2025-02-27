@@ -6,6 +6,8 @@
     "lint": "node fern.js lint",
     "build": "node fern.js build configs/sandbox.js --environment prod",
     "build-module": "node fern.js build configs/module.js --environment prod",
+    "build-without-polyfill": "./build-without-polyfill.sh",
+    "send-test-msg": "npm run build-without-polyfill && ./send-test-msg.js",
     "postinstall": "patch-package",
     "start:brave": "web-ext run --source-dir='./build' --target chromium --chromium-binary \"$BRAVE_PATH\"",
     "start:build": "node --unhandled-rejections=strict fern.js serve configs/sandbox.js --no-launch",
