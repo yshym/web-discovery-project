@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "node fern.js lint",
     "build": "node fern.js build configs/sandbox.js --environment prod",
-    "build-module": "node fern.js build configs/module.js --environment prod",
+    "build-module": "node fern.js build configs/module.js --environment sandbox",
     "build-without-polyfill": "./build-without-polyfill.sh",
     "send-test-msg": "npm run build-without-polyfill && ./send-test-msg.js",
     "postinstall": "patch-package",

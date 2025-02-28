@@ -9,8 +9,8 @@ module.exports = {
   pack: "npm pack",
   settings: {
     ...base.settings,
-    ...urls("production"),
+    ...urls("sandbox"),
     WDP_PATTERNS_SIGNING: true,
-    WDP_ENV: "production",
+    WDP_ENV: "sandbox",
   },
 };
