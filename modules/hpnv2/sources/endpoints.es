@@ -3,7 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import config from "../core/config";
-import { fetch, Headers, Response, AbortController } from "../core/http";
+// import { fetch, Headers, Response, AbortController } from "../core/http";
+import fetch, {Headers, Response } from "node-fetch";
 import random from "../core/crypto/random";
 import logger from "./logger";
 import {

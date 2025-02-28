@@ -280,14 +280,16 @@ export function service() {
   return pm;
 }
 
-export default inject.service("pacemaker", [
-  "register",
-  "everySecond",
-  "everyFewSeconds",
-  "everyMinute",
-  "everyFewMinutes",
-  "everyHour",
-  "nextIdle",
-  "setTimeout",
-  "clearTimeout",
-]);
+export default new Pacemaker();
+
+// export default inject.service("pacemaker", [
+//   "register",
+//   "everySecond",
+//   "everyFewSeconds",
+//   "everyMinute",
+//   "everyFewMinutes",
+//   "everyHour",
+//   "nextIdle",
+//   "setTimeout",
+//   "clearTimeout",
+// ]);

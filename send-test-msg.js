@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const SafebrowsingEndpoint =
-  require("./build/web-discovery-project/safebrowsing-endpoint.js").default;
+const Endpoints = require("./build/hpnv2/endpoints.js").default;
 const crypto = require('crypto').webcrypto;
 
 function random() {
@@ -21,7 +20,7 @@ const getDate = () => {
 
 const buildTestMsg = () => {
   return {
-    action: "wtm-m.query0",
+    action: "query0",
     "anti-duplicates": Math.floor(random() * 10000000),
     channel: "brave-native-android",
     payload: {
@@ -37,12 +36,11 @@ const buildTestMsg = () => {
   };
 };
 
-const sendMessage = (msg, instantPush) => {
-  const safebrowsingEndpoint = new SafebrowsingEndpoint();
-  safebrowsingEndpoint.init();
+const sendMessage = (msg) => {
   const start = new Date();
-  safebrowsingEndpoint
-    .send(msg, { instantPush })
+  const endpoints = new Endpoints();
+  endpoints
+    .send(msg, { instant: true })
     .then(() => {
       console.log(
         "Successfully sent message after",
@@ -59,8 +57,6 @@ const sendMessage = (msg, instantPush) => {
         msg,
       );
     });
-  safebrowsingEndpoint.flushSendQueue();
-  safebrowsingEndpoint.unload();
 };
 
 sendMessage(buildTestMsg());
